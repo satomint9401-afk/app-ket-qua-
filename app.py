@@ -1,11 +1,10 @@
-
 import streamlit as st
 import collections
 
 st.set_page_config(page_title="Phân Tích Thuật Toán Sicbo", page_icon="🎲", layout="wide")
 
 st.title("🎲 HỆ THỐNG PHÂN TÍCH & GIÁM SÁT ĐIỂM GIAM SICBO")
-st.caption("Ứng dụng phân tích dữ liệu xúc xắc chạy trên trình duyệt Web")
+st.caption("Ứng dụng phân tích dữ liệu xúc xắc chạy trên trình duyệt Web (Có tính năng gợi ý bộ số theo quy luật)")
 
 if "lich_su_diem" not in st.session_state:
     st.session_state.lich_su_diem = []
@@ -70,7 +69,7 @@ if btn_submit and input_user:
         st.error("❌ Lỗi định dạng! Nhập theo dạng: số,số,số (Ví dụ: 5,2,6).")
 
 with col2:
-    st.subheader("📊 Bảng Thống Kê & Giám Sát Điểm Giam")
+    st.subheader("📊 Bảng Thống Kê & Gợi Ý Quy Luật")
     if st.session_state.tong_so_phien > 0:
         c1, c2, c3 = st.columns(3)
         c1.metric("Tổng số phiên", f"{st.session_state.tong_so_phien}")
@@ -88,8 +87,26 @@ with col2:
         top_giam_diem, top_giam_so_phien = danh_sach_giam[0]
         c3.metric("Tổng bị giam sâu nhất", f"Tổng {top_giam_diem}", f"{top_giam_so_phien} phiên chưa ra")
 
+        # --- TÍNH TOÁN GỢI Ý CÁC CON SỐ CÓ KHẢ NĂNG RA DỰA TRÊN QUY LUẬT ---
+        st.markdown("---")
+        st.info("🔮 **GỢI Ý QUY LUẬT & CON SỐ TIỀM NĂNG CHO PHIÊN KẾ TIẾP:**")
+        
+        # 1. Gợi ý theo điểm đang bị giam sâu (Xả nén)
+        goi_y_tong = [item[0] for item in danh_sach_giam[:3]] # Lấy top 3 tổng bị giam lâu nhất
+        st.write(- **Nhóm tổng tiềm năng xả nén (Bị giam lâu):** Tổng `{goi_y_tong[0]}`, `{goi_y_tong[1]}`, `{goi_y_tong[2]}` (Do chu kỳ tích lũy dài).")
+
+        # 2. Gợi ý mặt đơn lẻ xuất hiện nhiều/ít dựa trên lịch sử bộ số gần đây
+        recent_faces = []
+        for bs in st.session_state.lich_su_bo_so[-5:]: # Xem 5 phiên gần nhất
+            recent_faces.extend(bs)
+        face_counter = collections.Counter(recent_faces)
+        mat_noi_bat = [f[0] for f in face_counter.most_common(2)]
+        
+        if mat_noi_bat:
+            st.write(- **Mặt xúc xắc đang có tần suất hút dòng tiền (5 phiên gần đây):** Mặt `{mat_noi_bat}`.")
+
         if top_giam_so_phien >= 8:
-            st.warning(f"⚠️ **CẢNH BÁO MẠNH:** Tổng **[{top_giam_diem}]** đã bị giam **{top_giam_so_phien} phiên** liên tiếp. Thuật toán có khả năng cao chuẩn bị xả nén mốc này!")
+            st.warning(f"⚠️ **CẢNH BÁO MẠNH:** Tổng **[{top_giam_diem}]** đã bị giam **{top_giam_so_phien} phiên**. Thuật toán có xu hướng bung điểm này!")
 
         st.write("---")
         st.write("📋 **Top 5 tổng điểm bị giam lâu nhất:**")
@@ -99,6 +116,6 @@ with col2:
 
         st.write("📜 **Lịch sử các phiên vừa nhập:**")
         for log in st.session_state.logs[:10]:
-            st.markdown(f"- {log}")
+            st.markdown(- {log})
     else:
-        st.info("Hãy nhập kết quả phiên đầu tiên ở bên trái để bắt đầu phân tích.")
+        st.info("Hãy nhập kết quả phiên đầu tiên ở bên trái để hệ thống bắt đầu phân tích quy luật.")
