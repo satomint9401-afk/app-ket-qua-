@@ -87,23 +87,20 @@ with col2:
         top_giam_diem, top_giam_so_phien = danh_sach_giam[0]
         c3.metric("Tổng bị giam sâu nhất", f"Tổng {top_giam_diem}", f"{top_giam_so_phien} phiên chưa ra")
 
-        # --- TÍNH TOÁN GỢI Ý CÁC CON SỐ CÓ KHẢ NĂNG RA DỰA TRÊN QUY LUẬT ---
         st.markdown("---")
         st.info("🔮 **GỢI Ý QUY LUẬT & CON SỐ TIỀM NĂNG CHO PHIÊN KẾ TIẾP:**")
         
-        # 1. Gợi ý theo điểm đang bị giam sâu (Xả nén)
-        goi_y_tong = [item[0] for item in danh_sach_giam[:3]] # Lấy top 3 tổng bị giam lâu nhất
-        st.write(- **Nhóm tổng tiềm năng xả nén (Bị giam lâu):** Tổng `{goi_y_tong[0]}`, `{goi_y_tong[1]}`, `{goi_y_tong[2]}` (Do chu kỳ tích lũy dài).")
+        goi_y_tong = [item[0] for item in danh_sach_giam[:3]]
+        st.markdown(f"- **Nhóm tổng tiềm năng xả nén (Bị giam lâu):** Tổng `{goi_y_tong[0]}`, `{goi_y_tong[1]}`, `{goi_y_tong[2]}` (Do chu kỳ tích lũy dài).")
 
-        # 2. Gợi ý mặt đơn lẻ xuất hiện nhiều/ít dựa trên lịch sử bộ số gần đây
         recent_faces = []
-        for bs in st.session_state.lich_su_bo_so[-5:]: # Xem 5 phiên gần nhất
+        for bs in st.session_state.lich_su_bo_so[-5:]:
             recent_faces.extend(bs)
         face_counter = collections.Counter(recent_faces)
         mat_noi_bat = [f[0] for f in face_counter.most_common(2)]
         
         if mat_noi_bat:
-            st.write(- **Mặt xúc xắc đang có tần suất hút dòng tiền (5 phiên gần đây):** Mặt `{mat_noi_bat}`.")
+            st.markdown(f"- **Mặt xúc xắc đang có tần suất hút dòng tiền (5 phiên gần đây):** Mặt `{mat_noi_bat}`.")
 
         if top_giam_so_phien >= 8:
             st.warning(f"⚠️ **CẢNH BÁO MẠNH:** Tổng **[{top_giam_diem}]** đã bị giam **{top_giam_so_phien} phiên**. Thuật toán có xu hướng bung điểm này!")
@@ -116,6 +113,6 @@ with col2:
 
         st.write("📜 **Lịch sử các phiên vừa nhập:**")
         for log in st.session_state.logs[:10]:
-            st.markdown(- {log})
+            st.markdown(f"- {log}")
     else:
         st.info("Hãy nhập kết quả phiên đầu tiên ở bên trái để hệ thống bắt đầu phân tích quy luật.")
